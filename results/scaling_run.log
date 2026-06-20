@@ -1,0 +1,21 @@
+
+=== perfect : coverage(detection) | mission_t | %capped, by fleet ===
+fleet                 centralized             decentralized                 stigmergy
+10      0.982(1.00)|  456|  0% 0.977(1.00)|  437|  0% 0.724(0.68)|  nan|100%
+20      0.955(1.00)|  192|  0% 0.979(1.00)|  180|  0% 0.966(1.00)|  488|  0%
+30      0.969(1.00)|  157|  0% 0.978(1.00)|  149|  0% 0.975(1.00)|  390|  0%
+
+=== range : coverage(detection) | mission_t | %capped, by fleet ===
+fleet                 centralized             decentralized                 stigmergy
+10      0.200(0.26)|  nan|100% 0.964(0.95)|  412| 20% 0.740(0.72)|  540| 80%
+20      0.301(0.38)|  nan|100% 0.948(1.00)|  174|  0% 0.963(1.00)|  428|  0%
+30      0.352(0.44)|  nan|100% 0.965(1.00)|  152|  0% 0.973(1.00)|  415|  0%
+
+=== dead_zone : coverage(detection) | mission_t | %capped, by fleet ===
+fleet                 centralized             decentralized                 stigmergy
+10      0.380(0.40)|  nan|100% 0.972(0.99)|  624| 20% 0.729(0.70)|  nan|100%
+20      0.760(0.78)|  nan|100% 0.987(1.00)|  234|  0% 0.972(1.00)|  455|  0%
+30      0.825(0.85)|  nan|100% 0.946(1.00)|  177|  0% 0.979(1.00)|  429|  0%
+Saved plot: results/scaling_coverage.png
+Saved plot: results/scaling_detection.png
+Saved plot: results/scaling_mission_time.png

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>swarm_sar</name>
+  <version>0.1.0</version>
+  <description>
+    ROS2 + Gazebo backend for the Resilient Multi-Agent Drone Swarm SAR project.
+    Maps the lightweight Python simulator (swarm_sim/) onto ROS2 nodes and a
+    Gazebo world so the SAME three coordination strategies (centralized,
+    decentralized-consensus, bio-inspired stigmergy) and the SAME communication
+    failure models (packet loss / range / dead zone / latency) can be run in a
+    high-fidelity physics simulator and, ultimately, transferred to PX4 hardware.
+  </description>
+
+  <maintainer email="vaishik@gmail.com">DroneSwarmResearch</maintainer>
+  <license>MIT</license>
+
+  <!-- ament_python build -->
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <!-- core ROS2 runtime -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+
+  <!-- launch / simulation -->
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <!-- Gazebo (Ignition/Gazebo Sim or Gazebo Classic via gazebo_ros).
+       Humble pairs with Gazebo Classic 11; swap to ros_gz for newer Gazebo. -->
+  <exec_depend>gazebo_ros</exec_depend>
+
+  <!-- Custom interfaces live in the sibling ament_cmake package.
+       See README "Message design choice". -->
+  <exec_depend>swarm_sar_interfaces</exec_depend>
+
+  <!-- numpy is used by the ported strategy logic -->
+  <exec_depend>python3-numpy</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

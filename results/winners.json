@@ -1,0 +1,142 @@
+{
+  "perfect": {
+    "winner": "decentralized",
+    "ranking": [
+      {
+        "strategy": "decentralized",
+        "coverage_auc": 0.951,
+        "coverage_at_worst": 0.951
+      },
+      {
+        "strategy": "stigmergy",
+        "coverage_auc": 0.923,
+        "coverage_at_worst": 0.923
+      },
+      {
+        "strategy": "centralized",
+        "coverage_auc": 0.915,
+        "coverage_at_worst": 0.915
+      }
+    ]
+  },
+  "packet_loss": {
+    "winner": "centralized",
+    "ranking": [
+      {
+        "strategy": "centralized",
+        "coverage_auc": 1.029,
+        "coverage_at_worst": 0.961
+      },
+      {
+        "strategy": "stigmergy",
+        "coverage_auc": 0.97,
+        "coverage_at_worst": 0.949
+      },
+      {
+        "strategy": "decentralized",
+        "coverage_auc": 0.969,
+        "coverage_at_worst": 0.902
+      }
+    ]
+  },
+  "range": {
+    "winner": "stigmergy",
+    "ranking": [
+      {
+        "strategy": "stigmergy",
+        "coverage_auc": 1.018,
+        "coverage_at_worst": 0.944
+      },
+      {
+        "strategy": "decentralized",
+        "coverage_auc": 0.991,
+        "coverage_at_worst": 0.922
+      },
+      {
+        "strategy": "centralized",
+        "coverage_auc": 0.72,
+        "coverage_at_worst": 0.298
+      }
+    ]
+  },
+  "dead_zone": {
+    "winner": "stigmergy",
+    "ranking": [
+      {
+        "strategy": "stigmergy",
+        "coverage_auc": 0.991,
+        "coverage_at_worst": 0.909
+      },
+      {
+        "strategy": "decentralized",
+        "coverage_auc": 0.986,
+        "coverage_at_worst": 0.943
+      },
+      {
+        "strategy": "centralized",
+        "coverage_auc": 0.893,
+        "coverage_at_worst": 0.618
+      }
+    ]
+  },
+  "node_failure": {
+    "winner": "decentralized",
+    "ranking": [
+      {
+        "strategy": "decentralized",
+        "coverage_auc": 0.932,
+        "coverage_at_worst": 0.657
+      },
+      {
+        "strategy": "centralized",
+        "coverage_auc": 0.89,
+        "coverage_at_worst": 0.53
+      },
+      {
+        "strategy": "stigmergy",
+        "coverage_auc": 0.71,
+        "coverage_at_worst": 0.289
+      }
+    ]
+  },
+  "node_failure_targeted": {
+    "winner": "decentralized",
+    "ranking": [
+      {
+        "strategy": "decentralized",
+        "coverage_auc": 0.867,
+        "coverage_at_worst": 0.494
+      },
+      {
+        "strategy": "centralized",
+        "coverage_auc": 0.865,
+        "coverage_at_worst": 0.505
+      },
+      {
+        "strategy": "stigmergy",
+        "coverage_auc": 0.693,
+        "coverage_at_worst": 0.293
+      }
+    ]
+  },
+  "combined": {
+    "winner": "decentralized",
+    "ranking": [
+      {
+        "strategy": "decentralized",
+        "coverage_auc": 1.0,
+        "coverage_at_worst": 0.924
+      },
+      {
+        "strategy": "centralized",
+        "coverage_auc": 1.0,
+        "coverage_at_worst": 0.405
+      },
+      {
+        "strategy": "stigmergy",
+        "coverage_auc": 0.983,
+        "coverage_at_worst": 0.913
+      }
+    ]
+  }
+}

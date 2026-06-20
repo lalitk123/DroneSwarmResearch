@@ -1,0 +1,44 @@
+# Parameters for the swarm_sar ROS2 backend.
+#
+# Mirrors swarm_sim/config.py:SimConfig. The `/**` wildcard applies these to every
+# node in the launch (drone_node, comm_bridge_node, base_station_node, metrics_node);
+# per-node overrides (e.g. drone_id) are injected by the launch file.
+#
+# Override on the CLI, e.g.:
+#   ros2 launch swarm_sar swarm_sar.launch.py params_file:=/path/to/my_params.yaml
+/**:
+  ros__parameters:
+    # ---- world (mirrors SimConfig) ----
+    map_width: 50
+    map_height: 50
+    n_drones: 10
+    n_victims: 15
+    seed: 0
+
+    # ---- drone kinematics / sensing ----
+    sensing_radius: 3.0
+    comm_radius: 12.0
+    speed: 1.0
+
+    # ---- coordination strategy ----
+    # one of: centralized | decentralized | stigmergy
+    strategy: "centralized"
+
+    # ---- communication failure model (mirrors swarm_sim/comm.py) ----
+    # comm_model one of: perfect | packet_loss | range | dead_zone | latency | composite
+    comm_model: "perfect"
+    severity: 0.0              # generic 0..1 severity knob used by sweeps
+    packet_loss_p: 0.0         # Bernoulli drop probability (packet_loss)
+    range_radius: 12.0         # delivery radius (range)
+    range_mode: "disk"         # disk | pathloss
+    max_delay: 3               # max integer step delay (latency)
+    # dead zones, flattened as [y0,x0,y1,x1, y0,x0,y1,x1, ...]; [0.0] = none
+    dead_zones_flat: [0.0]
+
+    # ---- timing (ROS2 executor periods, seconds) ----
+    control_period_s: 0.2      # drone control loop
+    plan_period_s: 0.2         # strategy replanning
+    report_period_s: 1.0       # metrics reporting
+
+    # ---- victims, flattened as [y,x, y,x, ...]; [0.0] = randomize from seed ----
+    victims_flat: [0.0]

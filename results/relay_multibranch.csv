@@ -1,0 +1,10 @@
+variant,wall_len,coverage,detection,connectivity
+centralized,30,0.251,0.293,0.682
+single-chain relay,30,0.537,0.54,0.465
+multi-branch relay,30,0.64,0.633,0.564
+centralized,38,0.251,0.293,0.682
+single-chain relay,38,0.488,0.473,0.488
+multi-branch relay,38,0.539,0.52,0.561
+centralized,44,0.251,0.293,0.682
+single-chain relay,44,0.452,0.44,0.533
+multi-branch relay,44,0.49,0.467,0.584

@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<!--
+  Gazebo (SDF) disaster world for swarm_sar.
+
+  A flat SAR arena with scattered obstacle blocks standing in for rubble/buildings —
+  the high-fidelity analogue of swarm_sim/world.py's obstacle clusters. Drone models
+  are spawned separately by launch/swarm_sar.launch.py (n_drones param). Victims are
+  tracked logically by metrics_node (no physical model needed for the SAR metric).
+
+  Scale: 1 Gazebo metre ~= 1 grid cell in the Python sim. Default arena 50x50.
+-->
+<sdf version="1.7">
+  <world name="disaster">
+
+    <!-- physics + plugins -->
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-user-commands-system"
+            name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster"/>
+
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.8 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 30 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.4 0.3 -0.9</direction>
+    </light>
+
+    <!-- ground plane (the 50x50 arena) -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>50 50</size></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>50 50</size></plane></geometry>
+          <material><ambient>0.3 0.3 0.3 1</ambient><diffuse>0.4 0.4 0.4 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- obstacle blocks (rubble / damaged structures). A representative cluster;
+         for parametric layouts, generate this file from SimConfig at build time. -->
+    <model name="obstacle_1"><static>true</static><pose>12 14 1.5 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><box><size>3 3 3</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>3 3 3</size></box></geometry>
+        <material><diffuse>0.5 0.35 0.2 1</diffuse></material></visual></link></model>
+    <model name="obstacle_2"><static>true</static><pose>30 8 2 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><box><size>4 6 4</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>4 6 4</size></box></geometry>
+        <material><diffuse>0.5 0.35 0.2 1</diffuse></material></visual></link></model>
+    <model name="obstacle_3"><static>true</static><pose>22 32 1.5 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><box><size>5 3 3</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>5 3 3</size></box></geometry>
+        <material><diffuse>0.5 0.35 0.2 1</diffuse></material></visual></link></model>
+    <model name="obstacle_4"><static>true</static><pose>38 38 2 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><box><size>4 4 4</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>4 4 4</size></box></geometry>
+        <material><diffuse>0.5 0.35 0.2 1</diffuse></material></visual></link></model>
+    <model name="obstacle_5"><static>true</static><pose>8 40 1.5 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><box><size>3 5 3</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>3 5 3</size></box></geometry>
+        <material><diffuse>0.5 0.35 0.2 1</diffuse></material></visual></link></model>
+
+  </world>
+</sdf>
