@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resilient Drone Swarms for Disaster Search-and-Rescue</title>
+<meta name="description" content="A study of which multi-agent drone-swarm coordination strategies survive communication failures during disaster search-and-rescue — and how adaptive relays restore coverage." />
+<style>
+  :root{
+    --bg:#0b1020; --bg2:#111831; --panel:#151d38; --panel2:#1b2547;
+    --ink:#e8ecf8; --muted:#9aa6c8; --line:#26305a;
+    --accent:#5cc8ff; --accent2:#7c8cff; --good:#46d39a; --bad:#ff6b6b; --warn:#ffce5c;
+    --radius:16px; --max:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:linear-gradient(180deg,var(--bg),#080c18 60%);color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  /* nav */
+  nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);
+    background:rgba(8,12,24,.7);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  nav .brand{font-weight:700;letter-spacing:.2px}
+  nav .brand span{color:var(--accent)}
+  nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0}
+  nav a{color:var(--muted);font-size:14px;font-weight:500}
+  nav a:hover{color:var(--ink);text-decoration:none}
+  @media(max-width:720px){nav ul{display:none}}
+  /* hero */
+  header.hero{padding:88px 0 64px;position:relative;overflow:hidden}
+  .hero h1{font-size:clamp(30px,5vw,52px);line-height:1.08;margin:0 0 18px;font-weight:800;
+    letter-spacing:-.5px}
+  .hero h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lede{font-size:clamp(17px,2.3vw,21px);color:var(--muted);max-width:760px;margin:0 0 28px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px}
+  .pill{border:1px solid var(--line);background:var(--panel);color:var(--muted);
+    padding:6px 13px;border-radius:999px;font-size:13px}
+  .cta{display:flex;flex-wrap:wrap;gap:12px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:12px;
+    font-weight:600;font-size:15px;border:1px solid var(--line)}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#06101f;border:0}
+  .btn.primary:hover{filter:brightness(1.07);text-decoration:none}
+  .btn.ghost{background:var(--panel);color:var(--ink)}
+  .btn.ghost:hover{background:var(--panel2);text-decoration:none}
+  .drones{position:absolute;inset:0;pointer-events:none;opacity:.5}
+  /* sections */
+  section{padding:54px 0;border-top:1px solid var(--line)}
+  h2{font-size:clamp(22px,3vw,30px);margin:0 0 8px;font-weight:750;letter-spacing:-.3px}
+  .sub{color:var(--muted);margin:0 0 30px;max-width:760px}
+  /* stat cards */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:860px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .stat .n{font-size:30px;font-weight:800;line-height:1}
+  .stat .n.bad{color:var(--bad)} .stat .n.good{color:var(--good)} .stat .n.acc{color:var(--accent)}
+  .stat .l{color:var(--muted);font-size:13.5px;margin-top:8px}
+  /* strategy cards */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:860px){.cards{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);
+    border-radius:var(--radius);padding:24px;transition:transform .15s,border-color .15s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent2)}
+  .card .tag{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent)}
+  .card h3{margin:8px 0 10px;font-size:20px}
+  .card p{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+  .verdict{font-size:13px;font-weight:600;padding:6px 11px;border-radius:8px;display:inline-block}
+  .verdict.good{background:rgba(70,211,154,.14);color:var(--good)}
+  .verdict.warn{background:rgba(255,206,92,.14);color:var(--warn)}
+  .verdict.bad{background:rgba(255,107,107,.14);color:var(--bad)}
+  /* table */
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:520px}
+  th,td{padding:12px 16px;text-align:center;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{color:var(--muted);font-weight:600;font-size:13px;background:var(--panel2)}
+  tbody tr:last-child td{border-bottom:0}
+  td.win{color:var(--good);font-weight:700}
+  td.lose{color:var(--bad);font-weight:700}
+  caption{caption-side:bottom;color:var(--muted);font-size:12.5px;padding:10px 4px;text-align:left}
+  /* figures */
+  .figs{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media(max-width:860px){.figs{grid-template-columns:1fr}}
+  figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden}
+  figure img{display:block;width:100%;height:auto}
+  figure figcaption{color:#33405e;background:#eef2fb;font-size:13px;padding:10px 14px;border-top:1px solid #d8e0f2}
+  /* takeaways */
+  .take{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:860px){.take{grid-template-columns:1fr}}
+  .take li{list-style:none}
+  .take .item{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:12px;padding:16px 18px}
+  .take .item b{color:var(--ink)}
+  .take .item p{margin:6px 0 0;color:var(--muted);font-size:14.5px}
+  /* demo */
+  .demo{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;align-items:start}
+  @media(max-width:860px){.demo{grid-template-columns:1fr}}
+  .stage{background:#0c1326;border:1px solid var(--line);border-radius:var(--radius);padding:12px;
+    display:flex;justify-content:center}
+  .stage canvas{width:100%;height:auto;max-width:528px;border-radius:8px;image-rendering:auto}
+  .panel-c{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .ctl{margin-bottom:16px}
+  .ctl label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+  .ctl select,.ctl input[type=range]{width:100%}
+  .ctl select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:9px;padding:9px 11px;font-size:14px}
+  .rowbtn{display:flex;gap:10px;margin:6px 0 18px}
+  .rowbtn button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;border:1px solid var(--line)}
+  #d_run{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#06101f;border:0}
+  #d_reset{background:var(--panel2);color:var(--ink)}
+  .readouts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .ro{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  .ro .v{font-size:22px;font-weight:800} .ro .k{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;font-size:12.5px;color:var(--muted)}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:middle}
+  .sevrow{display:flex;justify-content:space-between;align-items:center}
+  .sevrow .sevnum{font-size:13px;color:var(--ink);font-weight:700}
+  footer{border-top:1px solid var(--line);padding:36px 0 60px;color:var(--muted);font-size:14px}
+  footer a{color:var(--accent)}
+  .note{font-size:12.5px;color:var(--muted);margin-top:14px}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">Resilient<span>Swarms</span></div>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#demo">Live Demo</a></li>
+      <li><a href="#strategies">Strategies</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#relays">Relays</a></li>
+      <li><a href="#takeaways">Takeaways</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="drones" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><radialGradient id="g" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#5cc8ff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#5cc8ff" stop-opacity="0"/></radialGradient></defs>
+    <g fill="url(#g)">
+      <circle cx="180" cy="90" r="60"/><circle cx="980" cy="140" r="80"/>
+      <circle cx="640" cy="300" r="70"/><circle cx="420" cy="180" r="40"/>
+      <circle cx="820" cy="320" r="50"/>
+    </g>
+    <g stroke="#7c8cff" stroke-opacity="0.25" stroke-width="1">
+      <line x1="180" y1="90" x2="420" y2="180"/><line x1="420" y1="180" x2="640" y2="300"/>
+      <line x1="640" y1="300" x2="820" y2="320"/><line x1="980" y1="140" x2="640" y2="300"/>
+    </g>
+  </svg>
+  <div class="wrap">
+    <h1>Resilient Drone Swarms for Disaster<br><span class="grad">Search-and-Rescue</span> Under Communication Failures</h1>
+    <p class="lede">When earthquakes and fires sever radio links, which way of coordinating a drone swarm keeps finding survivors — and can a few relay drones rescue the ones that collapse? A simulation study of three coordination paradigms across six failure families.</p>
+    <div class="meta">
+      <span class="pill">Lalit Kovvuri · Archbishop Mitty High School</span>
+      <span class="pill">3 strategies × 6 failure families × 10 seeds</span>
+      <span class="pill">Python simulator + ROS&nbsp;2 backend</span>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/lalitk123/DroneSwarmResearch">View the code on GitHub</a>
+      <a class="btn ghost" href="#results">See the results ↓</a>
+    </div>
+  </div>
+</header>
+
+<section id="overview">
+  <div class="wrap">
+    <h2>The core finding</h2>
+    <p class="sub">It is not the <em>amount</em> of communication loss that decides success — it is the <em>structure</em>. Persistent, geographic loss is where centralized control dies and where decentralized and bio-inspired swarms win.</p>
+    <div class="stats">
+      <div class="stat"><div class="n bad">96.7% → 29.8%</div><div class="l">Centralized coverage collapse under severe range degradation</div></div>
+      <div class="stat"><div class="n good">0.991</div><div class="l">Decentralized resilience score (AUC) under range loss — near-flat</div></div>
+      <div class="stat"><div class="n good">1.018</div><div class="l">Stigmergy resilience score (AUC) — essentially immune to comms loss</div></div>
+      <div class="stat"><div class="n acc">0.26 → 0.89</div><div class="l">Coverage restored to centralized control by adaptive relays (R=12)</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <h2>Live demo — run the swarm yourself</h2>
+    <p class="sub">A lightweight in-browser port of the simulator. Pick a coordination strategy and a communication failure, then hit Run and watch coverage and connectivity evolve. Try <b>Centralized + Range loss</b> to see the collapse, then switch to <b>Stigmergy</b> on the same failure.</p>
+    <div class="demo">
+      <div class="stage"><canvas id="simCanvas" aria-label="Drone swarm simulation"></canvas></div>
+      <div class="panel-c">
+        <div class="ctl">
+          <label for="d_strategy">Coordination strategy</label>
+          <select id="d_strategy">
+            <option value="centralized">Centralized planner</option>
+            <option value="decentralized" selected>Decentralized gossip</option>
+            <option value="stigmergy">Stigmergy (pheromone)</option>
+          </select>
+        </div>
+        <div class="ctl">
+          <label for="d_failure">Communication failure</label>
+          <select id="d_failure">
+            <option value="perfect">Perfect comms</option>
+            <option value="range" selected>Range loss</option>
+            <option value="deadzone">Dead zone</option>
+            <option value="packet">Packet loss</option>
+          </select>
+        </div>
+        <div class="ctl">
+          <div class="sevrow"><label id="d_sevLabel" for="d_sev">Range loss</label><span class="sevnum" id="d_sevVal">60%</span></div>
+          <input type="range" id="d_sev" min="0" max="90" value="60" step="5">
+        </div>
+        <div class="ctl">
+          <div class="sevrow"><label for="d_drones">Swarm size</label><span class="sevnum" id="d_dronesVal">12</span></div>
+          <input type="range" id="d_drones" min="6" max="20" value="12" step="1">
+        </div>
+        <div class="rowbtn">
+          <button id="d_run">▶ Run</button>
+          <button id="d_reset">⟳ New map</button>
+        </div>
+        <div class="readouts">
+          <div class="ro"><div class="v" id="m_cov">0%</div><div class="k">Coverage</div></div>
+          <div class="ro"><div class="v" id="m_vic">0/12</div><div class="k">Victims found</div></div>
+          <div class="ro"><div class="v" id="m_conn">100%</div><div class="k">Connectivity</div></div>
+          <div class="ro"><div class="v" id="m_step">0</div><div class="k">Step</div></div>
+        </div>
+        <div class="legend">
+          <span><i style="background:#5cc8ff"></i>Drone</span>
+          <span><i style="background:#fff"></i>Base</span>
+          <span><i style="background:#ffce5c"></i>Victim</span>
+          <span><i style="background:#46d39a"></i>Found</span>
+          <span><i style="background:#2a3358"></i>Obstacle</span>
+          <span><i style="background:rgba(92,200,255,.4)"></i>Covered</span>
+        </div>
+      </div>
+    </div>
+    <p class="note">This browser demo is a simplified illustration of the methodology; the quantitative results below come from the full Python simulator (hundreds of Monte-Carlo trials).</p>
+  </div>
+</section>
+
+<section id="strategies">
+  <div class="wrap">
+    <h2>Three ways to coordinate a swarm</h2>
+    <p class="sub">Each strategy is a drop-in policy in a shared simulator with identical sensing, kinematics, and metrics — so differences are purely coordination, not implementation.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="tag">Baseline</div>
+        <h3>Centralized planner</h3>
+        <p>A base station aggregates everyone's map and assigns the nearest frontier to each drone. Optimal when connected — but a disconnected drone idles with no new orders.</p>
+        <span class="verdict bad">Collapses under geographic loss</span>
+      </div>
+      <div class="card">
+        <div class="tag">Consensus</div>
+        <h3>Decentralized gossip</h3>
+        <p>No base station. Drones merge maps pairwise with in-range neighbors (one hop per step) and each plans toward its own nearest frontier. Degrades gracefully.</p>
+        <span class="verdict good">Best all-rounder</span>
+      </div>
+      <div class="card">
+        <div class="tag">Bio-inspired</div>
+        <h3>Stigmergy (pheromone)</h3>
+        <p>No messaging at all. Drones leave a digital "explored" pheromone in the shared environment and move toward the faintest cells. Coordination is comms-free.</p>
+        <span class="verdict warn">Comms-loss specialist · needs density</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <h2>Who wins under what failure</h2>
+    <p class="sub">Coverage at mission completion, mean over 10 seeds. AUC = baseline-normalized resilience (1.0 = perfectly flat under degradation).</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Failure family</th><th>Centralized</th><th>Decentralized</th><th>Stigmergy</th><th>Winner</th></tr></thead>
+        <tbody>
+          <tr><td>Packet loss (5–20%)</td><td class="win">1.029</td><td>0.969</td><td>0.970</td><td>Centralized*</td></tr>
+          <tr><td>Range degradation</td><td class="lose">0.720</td><td>0.991</td><td class="win">1.018</td><td>Stigmergy</td></tr>
+          <tr><td>Dead zones (10–30%)</td><td class="lose">0.893</td><td>0.986</td><td class="win">0.991</td><td>Stigmergy</td></tr>
+          <tr><td>Node loss — random</td><td>0.890</td><td class="win">0.932</td><td class="lose">0.710</td><td>Decentralized</td></tr>
+          <tr><td>Node loss — targeted hubs</td><td>0.865</td><td>0.867</td><td class="lose">0.693</td><td>Cent ≈ Dec</td></tr>
+        </tbody>
+        <caption>Values are resilience AUC. *Under transient packet loss all three are within ~1 s.d. — read as “all comparable.” Targeted hub-kill erodes the decentralized lead because its gossip relays <em>are</em> the high-degree hubs.</caption>
+      </table>
+    </div>
+
+    <div class="figs" style="margin-top:26px">
+      <figure><img src="assets/degradation_range.png" alt="Coverage vs range-degradation severity"><figcaption>Range degradation: centralized collapses; decentralized & stigmergy stay flat.</figcaption></figure>
+      <figure><img src="assets/degradation_dead_zone.png" alt="Coverage vs dead-zone area fraction"><figcaption>Dead zones: same dichotomy — geographic loss breaks the centralized plan.</figcaption></figure>
+      <figure><img src="assets/degradation_node_failure.png" alt="Coverage vs random node loss"><figcaption>Random node loss: decentralized leads; stigmergy can't re-task survivors.</figcaption></figure>
+      <figure><img src="assets/scaling_coverage.png" alt="Coverage vs swarm size"><figcaption>Scaling: stigmergy fails below ~20 drones, then fully recovers (a density threshold).</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="relays">
+  <div class="wrap">
+    <h2>Rescuing the centralized swarm with relays</h2>
+    <p class="sub">Dedicate a few drones as repositioning multi-hop relays that bridge the base station to stranded searchers. They restore most of the lost coverage — but only with enough relays to span the gap.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Centralized config</th><th>R<sub>comm</sub>=18</th><th>R<sub>comm</sub>=12</th><th>R<sub>comm</sub>=9</th></tr></thead>
+        <tbody>
+          <tr><td>No relays</td><td class="lose">0.406</td><td class="lose">0.259</td><td class="lose">0.190</td></tr>
+          <tr><td>Adaptive relays (K=4)</td><td class="win">0.912</td><td class="win">0.894</td><td class="win">0.771</td></tr>
+        </tbody>
+        <caption>Coverage on a 40×40 map, 12 drones, n=10. Relays nearly triple coverage under range loss.</caption>
+      </table>
+    </div>
+    <div class="figs" style="margin-top:26px">
+      <figure><img src="assets/relay_rescue.png" alt="Relay rescue coverage and connectivity"><figcaption>Relays lift coverage and connectivity in step as comm range shrinks.</figcaption></figure>
+      <figure><img src="assets/relay_k_sweep.png" alt="Coverage vs relay count K"><figcaption>An interior optimum: ~4–5 relays for range loss, ~1–2 for localized dead zones.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="takeaways">
+  <div class="wrap">
+    <h2>What it means for real SAR swarms</h2>
+    <p class="sub">No single coordination paradigm is best everywhere. The right choice depends on the dominant failure, the agent density, and the terrain.</p>
+    <ul class="take" style="padding:0;margin:0">
+      <li class="item"><b>Structure beats severity.</b><p>Transient packet loss hurts no one; persistent geographic loss breaks centralized control. Engineer for <em>where</em> links fail, not just how often.</p></li>
+      <li class="item"><b>Decentralized is the safe default.</b><p>Never the outright loser in any scenario and scales with near-linear speedup — the strongest all-around choice.</p></li>
+      <li class="item"><b>Stigmergy trades one dependency for another.</b><p>Immune to comms loss, but needs a minimum agent density and can't re-task survivors after node loss.</p></li>
+      <li class="item"><b>Relays are a targeted repair.</b><p>A small adaptive relay team rescues centralized control under range loss — sized to the gap, and routed <em>around</em> dead zones, not through them.</p></li>
+    </ul>
+    <p class="note">Methodology: a lightweight 2.5-D Python simulator with pluggable communication-failure models and multi-hop routing; a portable ROS&nbsp;2 / Gazebo backend mirrors the same strategies for hardware transfer. Every number on this page is reproducible from the experiment modules in the repository.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>Resilient Multi-Agent Drone Swarms for Disaster Search-and-Rescue Under Communication Failures</b><br>
+    Lalit Kovvuri · Archbishop Mitty High School, San Jose, CA</p>
+    <p><a href="https://github.com/lalitk123/DroneSwarmResearch">Source code &amp; experiments on GitHub →</a></p>
+  </div>
+</footer>
+
+<script src="demo.js"></script>
+</body>
+</html>
